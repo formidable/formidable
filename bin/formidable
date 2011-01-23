@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "formidable"
+Formidable::Commands.run(ARGV)

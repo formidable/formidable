@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "getformidable"
   gem.homepage = "http://github.com/ankane/getformidable"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Formidable}
+  gem.description = %Q{Longer description of your gem}
   gem.email = "andrew@getformidable.com"
   gem.authors = ["Andrew Kane"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
