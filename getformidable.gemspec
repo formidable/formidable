@@ -9,24 +9,26 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Kane"]
-  s.date = %q{2011-01-20}
+  s.date = %q{2011-01-25}
   s.default_executable = %q{formidable}
   s.description = %q{Longer description of your gem}
   s.email = %q{andrew@getformidable.com}
   s.executables = ["formidable"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
-    ".document",
-    ".rspec",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
+    "VERSION",
     "bin/formidable",
+    "getformidable.gemspec",
+    "init.rb",
+    "lib/formidable.rb",
     "lib/formidable/attempt.rb",
     "lib/formidable/commands.rb",
     "lib/formidable/config.rb",
@@ -37,6 +39,7 @@ Gem::Specification.new do |s|
     "lib/formidable/timer.rb",
     "lib/formidable/view_helpers.rb",
     "lib/getformidable.rb",
+    "rails/init.rb",
     "spec/getformidable_spec.rb",
     "spec/spec_helper.rb"
   ]

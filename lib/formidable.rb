@@ -26,6 +26,7 @@ end
 module Formidable
 
   HOST = "dev-api.getformidable.com"
+  #HOST = "api.getformidable.com"
   VERSION = 1
   CONFIG_PATH = "config/formidable.yml"
 
@@ -50,6 +51,7 @@ module Formidable
       occurred_at = Time.now
 
       errors = args[:errors] || {}
+      errors = {:base => errors} if errors.any? and errors.kind_of?(Array)
 
       # values will be nil if errors and no args[:values]
       # we want this for later
@@ -62,15 +64,24 @@ module Formidable
 
       # get as much data as we can from the request object
       # don't override anything that was set
+      if args[:timing_data]
+        tt, t = Timer.parse(args[:timing_data])
+        total_time ||= tt
+        times ||= t
+      end
+
       request = Thread.current[:formidable_request]
       if request
         filter_parameters(request.env["action_dispatch.parameter_filter"])
         # if values aren't set, get them from request and delete
         values ||= request.params.reject{|k, v| [:utf8, :action, :controller, :authenticity_token, :commit, :formidable].include?(k.to_sym) }
         attempt ||= Attempt.parse(request, args[:form], errors.empty?)
-        tt, t = Timer.parse(request)
-        total_time ||= tt
-        times ||= t
+
+        if timing_data = request.params[:formidable]
+          tt, t = Timer.parse(request.params[:formidable])
+          total_time ||= tt
+          times ||= t
+        end
       else
         times ||= {}
       end

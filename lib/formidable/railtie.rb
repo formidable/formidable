@@ -5,7 +5,7 @@ module Formidable
   class Railtie < Rails::Railtie
 
     initializer "formidable.middleware" do |app|
-      Formidable::Config.load(File.join(Rails.root, "/config/formidable.yml"))
+      Formidable::Config.load(File.join(Rails.root, "/#{CONFIG_PATH}"))
       app.config.filter_parameters += [:formidable]
     end
   end

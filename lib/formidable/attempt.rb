@@ -5,7 +5,7 @@ module Formidable
       def parse(request, form, valid)
         hash = Digest::MD5.hexdigest("#{Config::api_key}.#{form}")
 
-        cookie = request.cookie_jar["formidable"]
+        cookie = request.cookies["formidable"]
         cookie_data = cookie ? Marshal.load(cookie) : {} rescue {}
         cookie_data[hash] ||= 1
         attempt = cookie_data[hash]
@@ -28,7 +28,7 @@ module Formidable
       private
 
       def save_cookie(data, request)
-        request.cookie_jar["formidable"] = {
+        request.cookies["formidable"] = {
           :value => Marshal.dump(data),
           :expires => 1.days.from_now
         }

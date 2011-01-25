@@ -8,15 +8,20 @@ module Formidable
 
       def send(data)
         uri = URI.parse("https://#{HOST}/track")
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        query = "api_key=#{Config.api_key}&version=#{VERSION}"
-        resp = http.post("#{uri.path}?#{query}", data.to_json)
 
-        if defined?(Rails)
-          Rails.logger.info data.to_json
-          Rails.logger.info "Response: #{resp.code}"
+        begin
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          query = "api_key=#{Config.api_key}&version=#{VERSION}"
+          res = http.post("#{uri.path}?#{query}", data.to_json)
+
+          if defined?(Rails)
+            Rails.logger.info data.to_json
+            Rails.logger.info "Response: #{res.code}"
+          end
+        rescue
+          nil
         end
       end
 

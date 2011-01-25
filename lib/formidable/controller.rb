@@ -6,7 +6,7 @@ module Formidable
         base.class_eval do
           before_filter { |c|
             Formidable.clear_filtered_parameters
-            Thread.current[:formidable_request] = request
+            Thread.current[:formidable_request] = c.request
           }
         end
       end

@@ -13,7 +13,7 @@ module Formidable
           @api_key = env_config["api-key"] || config["api-key"]
           @track_values = env_config["track-values"]
           @track_values = config["track-values"] if @track_values.nil?
-          @track_values = true if @track_values.nil?
+          @track_values = false if @track_values.nil?
         rescue Exception => e
           raise "Configuration error: #{e.message}"
         end
