@@ -7,12 +7,20 @@ module Formidable
     class << self
 
       def send(data)
-        uri = URI.parse("https://#{HOST}/track")
+        use_ssl = Config.use_ssl
+
+        protocol = use_ssl ? "https://" : "http://"
+        uri = URI.parse("#{protocol}#{HOST}/track")
 
         begin
           http = Net::HTTP.new(uri.host, uri.port)
-          http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          http.read_timeout = 2
+
+          if use_ssl
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          end
+
           query = "api_key=#{Config.api_key}&version=#{VERSION}"
           res = http.post("#{uri.path}?#{query}", data.to_json)
 

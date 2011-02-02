@@ -34,18 +34,10 @@ module Formidable
 
   class << self
 
-    def filter_parameters(*params)
-      @@filtered_params = @@filtered_params | params.flatten
-    end
+    def track(args)
+      return if Config.api_key.empty?
 
-    def clear_filtered_parameters
-      @@filtered_params = []
-    end
-
-    def track(*args)
-      return unless Config.api_key
-
-      args = args[0] if args.kind_of?(Array)
+      #args = args[0] if args.kind_of?(Array)
       raise "Must define a form." unless args[:form]
 
       occurred_at = Time.now
@@ -62,28 +54,36 @@ module Formidable
       total_time = args[:total_time]
       attempt = args[:attempt]
 
-      # get as much data as we can from the request object
-      # don't override anything that was set
       if args[:timing_data]
         tt, t = Timer.parse(args[:timing_data])
         total_time ||= tt
         times ||= t
       end
 
+      # get as much data as we can from the request object
+      # don't override anything that was set
       request = Thread.current[:formidable_request]
       if request
-        filter_parameters(request.env["action_dispatch.parameter_filter"])
+        # Rails 3
+        if request.env["action_dispatch.parameter_filter"]
+          filter_parameters(request.env["action_dispatch.parameter_filter"])
+        end
+
         # if values aren't set, get them from request and delete
         values ||= request.params.reject{|k, v| [:utf8, :action, :controller, :authenticity_token, :commit, :formidable].include?(k.to_sym) }
-        attempt ||= Attempt.parse(request, args[:form], errors.empty?)
 
         if timing_data = request.params[:formidable]
           tt, t = Timer.parse(request.params[:formidable])
           total_time ||= tt
           times ||= t
         end
-      else
-        times ||= {}
+      end
+
+      times ||= {}
+
+      cookies = Thread.current[:formidable_cookies]
+      if cookies
+        attempt ||= Attempt.parse(cookies, args[:form], errors.empty?)
       end
 
       # filter values
@@ -116,6 +116,18 @@ module Formidable
       Remote.send(data)
     end
 
+    def configure(*args)
+      Config.load(args)
+    end
+
+    def filter_parameters(*params)
+      @@filtered_params = @@filtered_params | params.flatten
+    end
+
+    def clear_filtered_parameters
+      @@filtered_params = []
+    end
+
     private
 
     def remove_prefix(data, regex)
@@ -140,7 +152,7 @@ module Formidable
       values = ret.dup unless values
       values.each do |k, v|
         k = "#{name}[#{k}]" if name
-        unless v.kind_of?(Hash) #or v.kind_of?(HashWithIndifferentAccess)
+        unless v.kind_of?(Hash)
           if !arr or v.kind_of?(Array)
             ret[k] = v
           else

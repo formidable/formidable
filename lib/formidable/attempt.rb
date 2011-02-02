@@ -2,23 +2,24 @@ module Formidable
   class Attempt
     class << self
 
-      def parse(request, form, valid)
+      def parse(cookies, form, valid)
         hash = Digest::MD5.hexdigest("#{Config::api_key}.#{form}")
 
-        cookie = request.cookies["formidable"]
+        cookie = cookies["formidable"]
         cookie_data = cookie ? Marshal.load(cookie) : {} rescue {}
+
         cookie_data[hash] ||= 1
         attempt = cookie_data[hash]
 
         unless valid
           cookie_data[hash] += 1
-          save_cookie(cookie_data, request)
+          save_cookie(cookies, cookie_data)
         else
           cookie_data.delete hash
           if cookie_data.empty?
-            request.cookie_jar.delete "formidable"
+            cookies.delete "formidable"
           else
-            save_cookie(cookie_data, request)
+            save_cookie(cookies, cookie_data)
           end
         end
 
@@ -27,10 +28,10 @@ module Formidable
 
       private
 
-      def save_cookie(data, request)
-        request.cookies["formidable"] = {
+      def save_cookie(cookies, data)
+        cookies["formidable"] = {
           :value => Marshal.dump(data),
-          :expires => 1.days.from_now
+          :expires => Time.now + 86400
         }
       end
 
