@@ -25,8 +25,8 @@ end
 
 module Formidable
 
-  HOST = "dev-api.getformidable.com"
-  #HOST = "api.getformidable.com"
+  HOST = "dev-www.getformidable.com"
+  #HOST = "formidable.heroku.com"
   VERSION = 1
   CONFIG_PATH = "config/formidable.yml"
 
@@ -40,15 +40,17 @@ module Formidable
       #args = args[0] if args.kind_of?(Array)
       raise "Must define a form." unless args[:form]
 
-      occurred_at = Time.now
-
       errors = args[:errors] || {}
       errors = {:base => errors} if errors.any? and errors.kind_of?(Array)
 
       # values will be nil if errors and no args[:values]
       # we want this for later
-      values = {} unless Config.track_values
-      values ||= errors.any? ? args[:values] : {}
+      values =
+      if Config.track_values and errors.any?
+        args[:values]
+      else
+        {}
+      end
 
       times = args[:times]
       total_time = args[:total_time]
@@ -80,6 +82,7 @@ module Formidable
       end
 
       times ||= {}
+      values ||= {}
 
       cookies = Thread.current[:formidable_cookies]
       if cookies
@@ -94,6 +97,9 @@ module Formidable
       flatten(values)
       flatten(times)
 
+      # delete values if no errors for field
+      values.delete_if{|k,v| !errors[k] or errors[k].empty?}
+
       # time to strip the prefix
       prefix = args[:prefix]
       if prefix
@@ -105,7 +111,6 @@ module Formidable
 
       data = {
         :form => args[:form],
-        :occurred_at => occurred_at,
         :errors => errors,
         :values => values,
         :times => times,
@@ -113,10 +118,17 @@ module Formidable
         :attempt => attempt
       }
 
-      Remote.send(data)
+      if Config.thread
+        Thread.new do
+          Remote.send(data)
+        end
+        true
+      else
+        Remote.send(data)
+      end
     end
 
-    def configure(*args)
+    def configure(args)
       Config.load(args)
     end
 

@@ -7,10 +7,11 @@ module Formidable
       DEFAULTS = {
         :api_key => "",
         :use_ssl => false,
-        :track_values => false
+        :track_values => false,
+        :thread => true
       }
 
-      attr_accessor :api_key, :use_ssl, :track_values
+      attr_accessor :api_key, :use_ssl, :track_values, :thread
 
       def load_file(config_file)
         begin
@@ -30,7 +31,7 @@ module Formidable
         # ensure we have default settings
         settings = DEFAULTS.merge(settings)
 
-        [:api_key, :use_ssl, :track_values].each do |setting|
+        [:api_key, :use_ssl, :track_values, :thread].each do |setting|
           self.send("#{setting}=", settings[setting])
         end
       end
