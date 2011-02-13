@@ -25,8 +25,7 @@ end
 
 module Formidable
 
-  HOST = "dev-www.getformidable.com"
-  #HOST = "formidable.heroku.com"
+  HOST = "www.getformidable.com"
   VERSION = 1
   CONFIG_PATH = "config/formidable.yml"
 
@@ -37,7 +36,6 @@ module Formidable
     def track(args)
       return if Config.api_key.empty?
 
-      #args = args[0] if args.kind_of?(Array)
       raise "Must define a form." unless args[:form]
 
       errors = args[:errors] || {}

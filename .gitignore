@@ -4,3 +4,5 @@ doc
 .yardoc
 .bundle
 pkg
+.rvmrc
+
