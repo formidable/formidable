@@ -11,7 +11,9 @@ if defined?(Rails::Railtie)
   require "formidable/railtie"
 end
 
-if defined?(ActiveRecord::Base)
+if defined?(ActiveModel::Validations)
+  ActiveModel::Validations.send :include, Formidable::Model
+elsif defined?(ActiveRecord::Base)
   ActiveRecord::Base.send :include, Formidable::Model
 end
 
